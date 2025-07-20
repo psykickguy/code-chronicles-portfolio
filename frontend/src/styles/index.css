@@ -1,0 +1,13 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "PressStart2P";
+  src: url("https://fonts.gstatic.com/s/pressstart2p/v11/8QIJdijZitv49rDfi8ywnTzqCf2x.woff2")
+    format("woff2");
+}
+
+.pixel-font {
+  font-family: "PressStart2P", monospace;
+} */
