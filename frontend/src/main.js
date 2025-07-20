@@ -1,13 +1,8 @@
-import kaboom from "kaboom";
-
-// initialize context
-kaboom({
-  font: "sink",
-  background: [210, 210, 210], // light gray background`
-});
+import { kaboomContext } from "./scripts/kaboomCtx.js";
+import { scaleFactor } from "./scripts/constants.js";
 
 // load assets
-loadSprite("Player", "../characters/Player/Player.png", {
+kaboomContext.loadSprite("Player", "../characters/Player/Player.png", {
   sliceX: 6,
   sliceY: 10,
   anims: {
@@ -28,29 +23,28 @@ loadSprite("Player", "../characters/Player/Player.png", {
 // define constants
 const SPEED = 180;
 
-//variables
-const player = add([
-  sprite("Player", { anim: "idleDown" }),
-  pos(center()),
-  scale(4),
-  area(),
+// create player
+const player = kaboomContext.add([
+  kaboomContext.sprite("Player", { anim: "idleDown" }),
+  kaboomContext.pos(kaboomContext.center()),
+  kaboomContext.scale(4),
+  kaboomContext.area(),
   "player",
 ]);
 
 let lastDirection = "idleDown";
 
-onKeyDown("left", () => {
+// movement controls
+kaboomContext.onKeyDown("left", () => {
   player.move(-SPEED, 0);
   player.flipX = true;
   if (player.curAnim() !== "walkLeft") {
     player.play("walkLeft");
   }
   lastDirection = "idleLeft";
-
-  // player.scale.x = -Math.abs(player.scale.x); // Flip horizontally by setting scale.x negative
 });
 
-onKeyDown("right", () => {
+kaboomContext.onKeyDown("right", () => {
   player.flipX = false;
   player.move(SPEED, 0);
   if (player.curAnim() !== "walkRight") {
@@ -59,7 +53,7 @@ onKeyDown("right", () => {
   lastDirection = "idleRight";
 });
 
-onKeyDown("up", () => {
+kaboomContext.onKeyDown("up", () => {
   player.move(0, -SPEED);
   if (player.curAnim() !== "walkUp") {
     player.play("walkUp");
@@ -67,7 +61,7 @@ onKeyDown("up", () => {
   lastDirection = "idleUp";
 });
 
-onKeyDown("down", () => {
+kaboomContext.onKeyDown("down", () => {
   player.move(0, SPEED);
   if (player.curAnim() !== "walkDown") {
     player.play("walkDown");
@@ -75,13 +69,73 @@ onKeyDown("down", () => {
   lastDirection = "idleDown";
 });
 
-onKeyRelease(() => {
+kaboomContext.onKeyRelease(() => {
   if (
-    !isKeyDown("left") &&
-    !isKeyDown("right") &&
-    !isKeyDown("up") &&
-    !isKeyDown("down")
+    !kaboomContext.isKeyDown("left") &&
+    !kaboomContext.isKeyDown("right") &&
+    !kaboomContext.isKeyDown("up") &&
+    !kaboomContext.isKeyDown("down")
   ) {
     player.play(lastDirection);
   }
 });
+
+// map loading and background
+kaboomContext.loadSprite("map", "../public/maps/map.png");
+
+kaboomContext.setBackground(kaboomContext.rgb(62, 137, 72));
+
+kaboomContext.scene("main", async () => {
+  const mapData = await (await fetch("public/maps/map.json")).json();
+  const layers = mapData.layers;
+
+  const map = kaboomContext.add([
+    kaboomContext.sprite("map"),
+    kaboomContext.pos(0),
+    kaboomContext.scale(scaleFactor),
+  ]);
+
+  const player = kaboomContext.make([
+    kaboomContext.sprite("spritesheet", { anim: "idle-down" }),
+    kaboomContext.area({
+      shape: new kaboomContext.Rect(kaboomContext.vec2(0, 3), 10, 10),
+    }),
+    kaboomContext.body(),
+    kaboomContext.anchor("center"),
+    kaboomContext.pos(),
+    kaboomContext.scale(scaleFactor),
+    {
+      speed: 256,
+      direction: "down",
+      isInDialogue: false,
+    },
+    "player",
+  ]);
+
+  for (const layer of layers) {
+    if (layer.name === "boundaries" || layer.name === "object-boundaries") {
+      for (const boundary of layer.objects) {
+        map.add([
+          kaboomContext.area({
+            shape: new kaboomContext.Rect(
+              kaboomContext.vec2(0),
+              boundary.width,
+              boundary.height
+            ),
+          }),
+          kaboomContext.body({ isStatic: true }),
+          kaboomContext.pos(boundary.x, boundary.y),
+          boundary.name,
+        ]);
+
+        if (boundary.name) {
+          player.onCollide(boundary.name, () => {
+            player.isInDialogue = true;
+          });
+        }
+      }
+    }
+  }
+});
+
+kaboomContext.go("main");

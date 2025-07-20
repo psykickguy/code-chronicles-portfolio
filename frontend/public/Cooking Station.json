@@ -1,0 +1,14 @@
+{ "columns":18,
+ "image":"Pixel Crawler - Free Pack\/Environment\/Structures\/Stations\/Cooking Station\/Cooking Station.png",
+ "imageheight":224,
+ "imagewidth":288,
+ "margin":0,
+ "name":"Cooking Station",
+ "spacing":0,
+ "tilecount":252,
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}
