@@ -1,4 +1,4 @@
-export const scaleFactor = 2;
+export const scaleFactor = 3;
 
 export const dialogueData = {
   exit: `You can close this tab anytime to exit the world.`,

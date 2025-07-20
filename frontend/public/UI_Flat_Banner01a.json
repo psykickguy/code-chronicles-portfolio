@@ -1,0 +1,14 @@
+{ "columns":4,
+ "image":"icons\/UI_Flat_Banner01a.png",
+ "imageheight":20,
+ "imagewidth":64,
+ "margin":0,
+ "name":"UI_Flat_Banner01a",
+ "spacing":0,
+ "tilecount":4,
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}
